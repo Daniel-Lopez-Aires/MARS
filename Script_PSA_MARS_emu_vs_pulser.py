@@ -383,7 +383,13 @@ print('Decay time of pre pulser: (' + str(t_decay_st[iPulser_pre]*1e6) + ' +/- '
 print('Decay time of pre emu: (' + str(t_decay_st[iEmu_pre]*1e6) + ' +/- ' + str(delta_t_decay_st[iEmu_pre]*1e6) + ')us' +"\n")
 ##############################################
 
+
+
+####################################################################
+##################DEcay time ratios#############################
+##################################################################
 #ratio between the decay time from the pre and from the detector
+
 ratio_t_decay_priEmu_rawaw = t_decay_st[iPulser_pre:iEmu_pre+1]/t_decay_st[iPulser_raw:iEmu_raw+1] #correct indexes, yes
 
 delta_ratio_t_decay_priEmu_rawaw = ratio_t_decay_priEmu_rawaw * np.sqrt( 
@@ -396,8 +402,11 @@ print('Decay time ratio pre/raw pulser: (' + str(ratio_t_decay_priEmu_rawaw[iPul
 print('Decay time ratio pre/raw emu: (' + str(ratio_t_decay_priEmu_rawaw[iEmu_raw] ) + ' +/- ' + str(delta_ratio_t_decay_priEmu_rawaw[iEmu_raw]) + "\n")
 
 
-#############################AMPLITUDES#####################################
 
+############################################################
+##################Amplitudes ratios#############################
+##################################################################
+#ratio between the amplitudes from the pre and from the detector
 
 print('Amplitude (Vmax) pulser (V) = ' + str(amplitude_st[iPulser_pre]) + ' +- ' + str(delta_amplitude_st[iPulser_pre]))
 print('Amplitude (Vmax) emu (V) =' + str(amplitude_st[iEmu_pre]) + ' +- ' + str(delta_amplitude_st[iEmu_pre]) +'\n')
@@ -405,8 +414,6 @@ print('Amplitude (Vmax) emu (V) =' + str(amplitude_st[iEmu_pre]) + ' +- ' + str(
 print('Amplitude (Vmax) raw pulser (V) = ' + str(amplitude_st[iPulser_raw]) + ' +- ' + str(delta_amplitude_st[iPulser_raw]))
 print('Amplitude (Vmax) raw emu (V) =' + str(amplitude_st[iEmu_raw]) + ' +- ' + str(delta_amplitude_st[iEmu_raw]) +'\n')
 
-
-#Amplitudes ratios, pre/raw
 
 ratio_ampl_priEmu_rawaw = amplitude_st[iEmu_raw+1:iEmu_pre+1]/amplitude_st[iPulser_raw:iEmu_raw+1]  #yup, correct indexes
 
