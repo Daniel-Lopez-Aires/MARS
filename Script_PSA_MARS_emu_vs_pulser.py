@@ -21,10 +21,8 @@ import numpy as np
     #np contain linspaces as np.linspace(a,b,N)
 import pandas as pd
         
-from plotly.graph_objs import Bar, Layout
-from plotly import offline
-from scipy import stats as stats     #to find the most commom element in a list
-
+#from plotly.graph_objs import Bar, Layout
+#from plotly import offline
 import sys                   #to import functions from other folders!!
 sys.path.insert(0, '/home/dla/Python/Functions_homemade')   #path where I have the functions
 
@@ -39,6 +37,8 @@ import Peak_analysis_oscilloscope
 #%% #########################################################
 #########################1), Data loading #####################
 #############################################################
+#Load from the .csv of the oscilloscope!
+
 
 #Variables that will store the results
 voltage_stored = np.array(np.array([]))
@@ -46,38 +46,44 @@ time_stored = np.array([])
 
 
 ########Ortec Pulser, raw########
-load = pd.read_csv('TEK0000.CSV', sep=',', header = None)
-                #, as sepparator, no header
+Pul_r = pd.read_csv('TEK0000.CSV', sep=',', header = None, 
+                   names = ['a', 'b', 'c','t[s]' , 'V[V]' , 'e'])
+                #, as sepparator, no header. I rename the columns, with letters
+                #the unimportant ones
+                
 iPulser_raw = 0                                                  #pulser_raw, index
 
 #Storing of the values
-voltage_stored = np.append(voltage_stored,load[load.columns[-1] -1 ]) #one to last line
-time_stored = np.append(time_stored,load[load.columns[-1] -2 ])  #two to last line
+voltage_stored = np.append(voltage_stored,Pul_r['V[V]']) #one to last line
+time_stored = np.append(time_stored,Pul_r['t[s]'])  #two to last line
 
 ############EMU RAW#################
-load = pd.read_csv('TEK0002.CSV', sep=',', header = None)   
+Emu_r = pd.read_csv('TEK0002.CSV', sep=',', header = None, 
+                   names = ['a', 'b', 'c','t[s]' , 'V[V]' , 'e']) 
 iEmu_raw = 1                                                  #emu_raw, index
 
 #Storing of the values
-voltage_stored = np.column_stack((voltage_stored,load[load.columns[-1] -1 ] ))
-time_stored = np.column_stack((time_stored,load[load.columns[-1] -2 ] ))   
+voltage_stored = np.column_stack((voltage_stored,Emu_r['V[V]'])) #one to last line
+time_stored = np.column_stack((time_stored, Emu_r['t[s]']) )  #two to last line 
   
 #########Ortec pulser, pre##########
-load = pd.read_csv('TEK0001.CSV', sep=',', header = None) 
+Pul_p = pd.read_csv('TEK0001.CSV', sep=',', header = None, 
+                   names = ['a', 'b', 'c','t[s]' , 'V[V]' , 'e'])
 iPulser_pre = 2                     #pulser_pre, index
 
 #Storing of the values
-voltage_stored = np.column_stack((voltage_stored,load[load.columns[-1] -1 ] ))
-time_stored = np.column_stack((time_stored,load[load.columns[-1] -2 ] ))   
+voltage_stored = np.column_stack((voltage_stored,Pul_p['V[V]'])) #one to last line
+time_stored = np.column_stack((time_stored,Pul_p['t[s]']))  #two to last line 
         #have to write column stack so it creates columns!
 
 #############EMU PRE####################
-load = pd.read_csv('TEK0003.CSV', sep=',', header = None)    
+Emu_p = pd.read_csv('TEK0003.CSV', sep=',', header = None, 
+                   names = ['a', 'b', 'c','t[s]' , 'V[V]' , 'e'])  
 iEmu_pre = 3                                                  #emu_pre, index
 
 #Storing of the values
-voltage_stored = np.column_stack((voltage_stored,load[load.columns[-1] -1 ] ))
-time_stored = np.column_stack((time_stored,load[load.columns[-1] -2 ] ))      
+voltage_stored = np.column_stack((voltage_stored,Emu_p['V[V]'])) #one to last line
+time_stored = np.column_stack((time_stored,Emu_p['t[s]']))  #two to last line    
    
 
         
@@ -222,8 +228,8 @@ delta_t_decay_st = np.array([])
 
 
 ####################################pulser RAW  ##########################3
-
-pulser_raw = Peak_analysis_oscilloscope.Peak_analysis_oscillo(voltage_stored,time_stored,'raw',0, 490, 1100, 
+pulser_raw = Peak_analysis_oscilloscope.Peak_analysis_oscillo(Pul_r['V[V]'],Pul_r['t[s]'],
+                                                'raw', 490, 1100, 
                                                  1/5 *50e-3, 1/5 * 1e-3 )
 
 #Storing
@@ -246,7 +252,8 @@ delta_t_decay_st = np.append(delta_t_decay_st,pulser_raw['\Delta(t_decay[s])'])
 
 ####################################emu RAW ##########################3
 
-emu_raw = Peak_analysis_oscilloscope.Peak_analysis_oscillo(voltage_stored,time_stored,'raw',1, 480, 800, 
+emu_raw = Peak_analysis_oscilloscope.Peak_analysis_oscillo(Emu_r['V[V]'],Emu_r['t[s]'],
+                                                'raw', 480, 800, 
                                                  1/5 *2, 1/5 * 500e-9 )
 
 #Storing
@@ -268,7 +275,8 @@ delta_t_decay_st = np.append(delta_t_decay_st,emu_raw['\Delta(t_decay[s])'])
 
 ################################PULSER PRE ###############################
 
-pulser_pre = Peak_analysis_oscilloscope.Peak_analysis_oscillo(voltage_stored,time_stored,'pre',2, 495, 800, 
+pulser_pre = Peak_analysis_oscilloscope.Peak_analysis_oscillo(Pul_p['V[V]'],Pul_p['t[s]'],
+                                                'pre', 495, 800, 
                                                  1/5 *50e-3, 1/5 * 500e-6 )
 
 
@@ -291,7 +299,8 @@ delta_t_decay_st = np.append(delta_t_decay_st,pulser_pre['\Delta(t_decay[s])'])
 
 #############################EMULATOR PRE   ###############################3
 
-emu_pre = Peak_analysis_oscilloscope.Peak_analysis_oscillo(voltage_stored,time_stored, 'pre' , 3, 490, 800, 
+emu_pre = Peak_analysis_oscilloscope.Peak_analysis_oscillo(Emu_p['V[V]'],Emu_p['t[s]'],
+                                                'pre', 490, 800, 
                                                  1/5 *5, 1/5 * 500e-9 )
 
 #Storing
