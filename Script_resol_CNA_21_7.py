@@ -252,4 +252,68 @@ plt.savefig('Resolution_gate_8kns.png', format='png')
 
 ##################3
 
-#For the remaining values, 25 and 40k, those calcs do not apply since the 3 peaks are no longer distinguisable
+#For the remaining values, 25 and 40k, those calcs do not apply since the 3 peaks
+# are no longer distinguisable
+
+
+
+
+#%% #################################################
+############# 3) Energy calibration #################
+#####################################################
+
+#For the energy calibration, I will use the measurement for 8k. Should use the best
+#which is 1k, but I do not know its gain :)
+
+#The energy are tabulated values. TO get the
+#channels of the peak, the best option is to use the mean of the gaussian fit!!
+
+
+E = np.array( [5156.59, 5485.56, 5804.82] )      #[keV] Energy of the 3 alpha peak
+ch = np.array( [fit_8k_peak_1['mean'] , 
+                fit_8k_peak_2['mean'], 
+                fit_8k_peak_3['mean']  ] )      #centroid of the gaussian giving 
+                        #the channels
+                        
+delta_ch = np.array( [fit_8k_peak_1['\Delta(mean)'] , 
+                fit_8k_peak_2['\Delta(mean)'], 
+                fit_8k_peak_3['\Delta(mean)']  ] )      # error of the centroid 
+                    #of the gaussian giving the channels
+                    
+
+#Now lets do the fit
+
+def linear(x, m, n):       #Definition of the function to use to fit the data
+    return m * x + n 
+                    
+lin_fit = Fits.LinearRegression(ch, E)          #fit        
+
+
+#Plot
+
+plt.figure(figsize=(8,5))  #width, heigh 6.4*4.8 inches by default
+plt.errorbar(ch, E, xerr = delta_ch, fmt='.r', capsize = 5)
+plt.plot(ch, [linear(i, lin_fit['Slope'], lin_fit['Intercept']) for i in ch] )  #fit
+plt.title("Energy calibration (gate= 8k ns)", fontsize=22, wrap=True)           #title
+plt.xlabel("ADC channels", fontsize=14)              #ylabel
+plt.ylabel('Energy (keV)', fontsize = 14)
+plt.legend(['linear fit','data',], fontsize=14)             #legend
+plt.tick_params(axis='both', labelsize=14)              #size of axis
+plt.grid(True) 
+plt.text(1050,5200, 'y(x) = {0:1.3f}x + {1:1.3f} ; r = {2:1.3f}'
+         .format(lin_fit['Slope'],lin_fit['Intercept'],lin_fit['r']), fontsize=14)    #first 2 arguments are x,y position.
+    #0:1.3f: 0 is 1st argument in format, 1.3f means float on 3 decimals
+#plt.xlim(5.35,5.55) 
+plt.savefig('Energy_calibration.png', format='png')
+
+
+
+#Now that we have the calibration, we could get the maximum energy we could measure
+#since we know the maximum channel number, 4096:
+    
+E_max = linear(4096, lin_fit['Slope'], lin_fit['Intercept'])
+
+print('Maximum energy that can be measured for 4096 channels with Energy Coarse Gain= 640: ' + str( E_max ) + ' keV' + "\n")
+
+#It gives 20MeV. Note that for the 1k data, with unkwnown gain, the max was 10MeV, so
+#by chaning the gain we can be able to increment the energy range of the detector!
